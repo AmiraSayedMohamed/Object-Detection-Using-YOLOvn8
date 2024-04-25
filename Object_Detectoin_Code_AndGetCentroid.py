@@ -17,28 +17,24 @@ while True:
             print("No frame captured. Exiting...")
             break
 
-        results = model(frame,show=True, conf=0.3)
+        results = model(frame, show=True, conf=0.3)
         result = results[0]
-        print(result)
+
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype="int")
         classes = np.array(result.boxes.cls.cpu(), dtype="int")
 
-        for result in results:
-            if result.boxes:
-                box = result.boxes[0]
-                class_id = int(box.cls)
-                confi= float(box.conf)
-                print('confidence is ', confi)
-                object_name = model.names[class_id]
-
-
-        for cls, bbox in zip(classes, bboxes):
+        for bbox, cls in zip(bboxes, classes):
             (x, y, x2, y2) = bbox
+            class_id = int(cls)
+            confi = float(result.boxes[0].conf)
+            object_name = model.names[class_id]
+
             cv2.rectangle(frame, (x, y), (x2, y2), (0, 0, 225), 2)
-            cv2.putText(frame, f"{object_name} {confi:0.2}" , (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 225), 5)
+            cv2.putText(frame, f"{object_name} {confi:.2f}", (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 225), 5)
             cx = (int(x + x2) // 2)
             cy = (int(y + y2) // 2)
             cv2.circle(frame, (cx, cy), 10, (0, 0, 255), -1)
+
         cv2.imshow("Frame", frame)
         key = cv2.waitKey(1)
         if key == 27:
