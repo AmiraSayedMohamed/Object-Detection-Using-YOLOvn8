@@ -21,16 +21,16 @@ while True:
         result = results[0]
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype="int")
+        confidences = np.array(result.boxes.conf.cpu(), dtype="float")
         classes = np.array(result.boxes.cls.cpu(), dtype="int")
 
-        for bbox, cls in zip(bboxes, classes):
+        for bbox, confi, cls in zip(bboxes, confidences, classes):
             (x, y, x2, y2) = bbox
             class_id = int(cls)
-            confi = float(result.boxes[0].conf)
             object_name = model.names[class_id]
 
             cv2.rectangle(frame, (x, y), (x2, y2), (0, 0, 225), 2)
-            cv2.putText(frame, f"{object_name} {confi:.2f}", (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 225), 5)
+            cv2.putText(frame, f"{object_name} {confi:.2f}", (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 225), 2)
             cx = (int(x + x2) // 2)
             cy = (int(y + y2) // 2)
             cv2.circle(frame, (cx, cy), 10, (0, 0, 255), -1)
